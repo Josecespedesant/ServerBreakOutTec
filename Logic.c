@@ -13,26 +13,29 @@ arr2d_t mx_new()
     srand(time(0)); //Necesario para números random
     for(int x = 0; x<ROWS; x++){
         for(int y = 0; y<COLS; y++){
-            //Filas rojas
             if(x<2){
+                //Filas rojas
                 mtrx.ladrillos[x][y].puntaje = 40; //Asigna puntaje
-                mtrx.ladrillos[x][y].powerUp = 0;
-                mtrx.ladrillos[x][y].color = 'r'; //Asigna el color del ladrillo
+                mtrx.ladrillos[x][y].powerUp = 0; //Inicializa el power up
+                mtrx.ladrillos[x][y].isBreak = 0; //0 Si está sin romper, 1 si está roto
             }
             else if(x >= 2 && x < 4){
-                mtrx.ladrillos[x][y].puntaje = 30;
-                mtrx.ladrillos[x][y].powerUp = 0;
-                mtrx.ladrillos[x][y].color = 'o';
+                //Filas anaranjadas
+                mtrx.ladrillos[x][y].puntaje = 30; //Asigna puntaje
+                mtrx.ladrillos[x][y].powerUp = 0; //Inicializa el power up
+                mtrx.ladrillos[x][y].isBreak = 0; //0 Si está sin romper, 1 si está roto
             }
             else if(x >= 4 && x < 6){
-                mtrx.ladrillos[x][y].puntaje = 20;
-                mtrx.ladrillos[x][y].powerUp = 0;
-                mtrx.ladrillos[x][y].color = 'y';
+                //Filas amarillas
+                mtrx.ladrillos[x][y].puntaje = 20; //Asigna puntaje
+                mtrx.ladrillos[x][y].powerUp = 0; //Inicializar el power up
+                mtrx.ladrillos[x][y].isBreak = 0; //0 Si está sin romper, 1 si está roto
             }
             else if(x >= 6 && x < 8){
-                mtrx.ladrillos[x][y].puntaje = 10;
-                mtrx.ladrillos[x][y].powerUp = 0;
-                mtrx.ladrillos[x][y].color = 'g';
+                //Filas verdes
+                mtrx.ladrillos[x][y].puntaje = 10; //Asigna puntaje
+                mtrx.ladrillos[x][y].powerUp = 0; //Inicializa el power up
+                mtrx.ladrillos[x][y].isBreak = 0; //0 Si está sin romper, 1 si está roto
             }
         }
     }
@@ -69,39 +72,68 @@ void adminMenu(){
                 scanf("%d", &r);
                 printf("\nIngrese la columna: ");
                 scanf("%d", &c);
-                set_power(pm,r,c,1);
+
+                if(get_ladri(*pm, r, c).isBreak == 0){
+                     set_power(pm,r,c,1);
+                     break;   
+                }
+                printf("El ladrillo se encuentra destruido");
                 break;
             case 2:
                 printf("\nIngrese la fila: ");
                 scanf("%d", &r);
                 printf("\nIngrese la columna: ");
                 scanf("%d", &c);
-                set_power(pm,r,c,2);
+                if(get_ladri(*pm, r, c).isBreak == 0){
+                     set_power(pm,r,c,2);
+                     break;   
+                }
+                printf("\nEl ladrillo se encuentra destruido");
                 break;
             case 3:
                 printf("\nIngrese la fila: ");
                 scanf("%d", &r);
                 printf("\nIngrese la columna: ");
                 scanf("%d", &c);
-                set_power(pm,r,c,3);
+                if(get_ladri(*pm, r, c).isBreak == 0){
+                     set_power(pm,r,c,3);
+                     break;   
+                }
+                printf("\nEl ladrillo se encuentra destruido");
+                break;
             case 4:
                 printf("\nIngrese la fila: ");
                 scanf("%d", &r);
                 printf("\nIngrese la columna: ");
                 scanf("%d", &c);
-                set_power(pm,r,c,4);
+                if(get_ladri(*pm, r, c).isBreak == 0){
+                     set_power(pm,r,c,4);
+                     break;   
+                }
+                printf("\nEl ladrillo se encuentra destruido");
+                break;
             case 5:
                 printf("\nIngrese la fila: ");
                 scanf("%d", &r);
                 printf("\nIngrese la columna: ");
                 scanf("%d", &c);
-                set_power(pm,r,c,5);
+                if(get_ladri(*pm, r, c).isBreak == 0){
+                     set_power(pm,r,c,5);
+                     break;   
+                }
+                printf("\nEl ladrillo se encuentra destruido");
+                break;
             case 6:
                 printf("\nIngrese la fila: ");
                 scanf("%d", &r);
                 printf("\nIngrese la columna: ");
                 scanf("%d", &c);
-                set_power(pm,r,c,6);
+                if(get_ladri(*pm, r, c).isBreak == 0){
+                     set_power(pm,r,c,6);
+                     break;   
+                }
+                printf("\nEl ladrillo se encuentra destruido");
+                break;
             default: 
                 scanf("%*s");
                 printf("Input inválido\n");

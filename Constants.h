@@ -15,9 +15,9 @@
  * y un puntaje pre-establecido.
  **/
 typedef struct ladrillo_t{
-    char color;
     int powerUp;
     int puntaje;
+    int isBreak;
 } ladrillo_t;
 
 /**
