@@ -54,7 +54,7 @@ void mx_fprint(arr2d_t mtrx){
 
 void adminMenu(){
     arr2d_t m = mx_new();
-    arr2d_t (*pm) = &m;
+    pm = &m;
     int selection;                
     int r;
     int c;

@@ -28,6 +28,7 @@ typedef struct arr2d{
     struct ladrillo_t ladrillos[ROWS][COLS];
 }arr2d_t;
 
+arr2d_t *pm;
 
 /**
  * Función que genera una nueva matriz 8x14 que corresponde al grid
