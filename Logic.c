@@ -7,10 +7,16 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 
 #ifndef OUT_OF_MEMORY
 #define OUT_OF_MEMORY
 #endif
+
+char mensaje[1024];
+bool conexion = true;
 
 arr2d_t mx_new()
 {
@@ -59,12 +65,58 @@ void mx_fprint(arr2d_t mtrx){
 
 void adminMenu(){
 
+    int conexion_servidor, conexion_cliente, puerto;
+    socklen_t longc;
+    struct sockaddr_in servidor, cliente;
+    char buffer[100];
+
+    puerto = 25557;
+    conexion_servidor = socket(AF_INET, SOCK_STREAM, 0);
+    bzero((char *)&servidor, sizeof(servidor));
+    servidor.sin_family = AF_INET;
+    servidor.sin_port = htons(puerto);
+    servidor.sin_addr.s_addr = INADDR_ANY;
+
+    if (bind(conexion_servidor, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
+        printf("Error al asociar el puerto a la conexion\n");
+        close(conexion_servidor);
+        return;
+    }
+
     arr2d_t m = mx_new();
     pm = &m;
     int selection;                
     int r;
     int c;
-    while(1){
+    while(conexion){
+        sprintf(mensaje, "");
+        listen(conexion_servidor, 3);
+        printf("A la escucha en el puerto %d\n", ntohs(servidor.sin_port));
+        longc = sizeof(cliente); //Asignamos el tamaño de la estructura a esta variable
+
+        conexion_cliente = accept(conexion_servidor, (struct sockaddr *) &cliente, &longc);
+        if (conexion_cliente < 0) {
+            while (conexion_cliente < 0) {
+                conexion_cliente = accept(conexion_servidor, (struct sockaddr *) &cliente, &longc);
+            }
+        }
+        printf("Conectando con el cliente\n");
+
+
+        if (recv(conexion_cliente, buffer, 100, 0) < 0) {
+            //Si recv() recibe 0 el cliente ha cerrado la conexion. Si es menor que 0 ha habido algún error.
+            printf("Error al recibir los datos\n");
+            close(conexion_servidor);
+            return;
+        } else {
+            printf("%s\n", buffer);
+            bzero((char *) &buffer, sizeof(buffer));
+            //agregarAlJuego();
+            if(conexion) {
+                send(conexion_cliente, mensaje, 1024, 0);
+            }
+        }
+
         printf("================================");
         printf("====BIENVENIDO=ADMINISTRADOR====");
         printf("================================");
@@ -144,9 +196,13 @@ void adminMenu(){
                 scanf("%*s");
                 printf("Input inválido\n");
                 break;
-        }        
+        }
+        
+        close(conexion_cliente);        
 
     }
+
+    close(conexion_cliente);
 }
 
 ladrillo_t get_ladri(arr2d_t matr, int i, int j){
@@ -161,6 +217,6 @@ void set_power(arr2d_t (*matr), int i, int j, int power){
 int main (int argc, char *argv[]) {
     //arr2d_t m = mx_new();
     //mx_fprint(m);
-    adminMenu(argc, argv);
+    adminMenu();
     return 0;
 }
