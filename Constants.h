@@ -29,6 +29,7 @@ typedef struct arr2d{
 }arr2d_t;
 
 arr2d_t *pm;
+arr2d_t m;
 
 /**
  * Función que genera una nueva matriz 8x14 que corresponde al grid
@@ -45,7 +46,8 @@ arr2d_t mx_new();
  **/
 void mx_fprint(arr2d_t mtrx);
 
-void adminMenu();
+void *adminMenu();
+void *server();
 
 /**
  * Función que devuelve un ladrillo en específico del grid.

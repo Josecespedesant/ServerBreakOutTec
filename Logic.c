@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 #ifndef OUT_OF_MEMORY
 #define OUT_OF_MEMORY
@@ -63,14 +64,17 @@ void mx_fprint(arr2d_t mtrx){
     }
 }
 
-void adminMenu(){
+void *server(){
 
+    sleep(1);
     int conexion_servidor, conexion_cliente, puerto;
     socklen_t longc;
     struct sockaddr_in servidor, cliente;
     char buffer[100];
 
-    puerto = 25557;
+
+
+    puerto = 25558;
     conexion_servidor = socket(AF_INET, SOCK_STREAM, 0);
     bzero((char *)&servidor, sizeof(servidor));
     servidor.sin_family = AF_INET;
@@ -82,13 +86,7 @@ void adminMenu(){
         close(conexion_servidor);
         return;
     }
-
-    arr2d_t m = mx_new();
-    pm = &m;
-    int selection;                
-    int r;
-    int c;
-    while(conexion){
+    while (conexion) {
         sprintf(mensaje, "");
         listen(conexion_servidor, 3);
         printf("A la escucha en el puerto %d\n", ntohs(servidor.sin_port));
@@ -116,7 +114,20 @@ void adminMenu(){
                 send(conexion_cliente, mensaje, 1024, 0);
             }
         }
+        close(conexion_cliente);
+    }
+    close(conexion_servidor);
+    return;
 
+}
+
+void *adminMenu(){
+    sleep(1);
+    
+    int selection;                
+    int r;
+    int c;
+    while(1){
         printf("================================");
         printf("====BIENVENIDO=ADMINISTRADOR====");
         printf("================================");
@@ -197,12 +208,9 @@ void adminMenu(){
                 printf("Input inválido\n");
                 break;
         }
-        
-        close(conexion_cliente);        
+          
 
     }
-
-    close(conexion_cliente);
 }
 
 ladrillo_t get_ladri(arr2d_t matr, int i, int j){
@@ -215,8 +223,14 @@ void set_power(arr2d_t (*matr), int i, int j, int power){
 }
 
 int main (int argc, char *argv[]) {
-    //arr2d_t m = mx_new();
-    //mx_fprint(m);
-    adminMenu();
-    return 0;
+    arr2d_t m = mx_new();
+    pm = &m;
+    pthread_t thread_1;
+    pthread_t thread_2;
+    pthread_create(&thread_2, NULL, adminMenu, NULL);
+    pthread_create(&thread_1, NULL, server, NULL);
+    
+    pthread_join(thread_2, NULL); 
+    pthread_join(thread_1, NULL);
+    exit(0);
 }
