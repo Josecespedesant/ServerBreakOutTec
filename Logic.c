@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include "Constants.h"
 #include <time.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <string.h>
 
 #ifndef OUT_OF_MEMORY
 #define OUT_OF_MEMORY
@@ -53,6 +58,7 @@ void mx_fprint(arr2d_t mtrx){
 }
 
 void adminMenu(){
+
     arr2d_t m = mx_new();
     pm = &m;
     int selection;                
@@ -155,6 +161,6 @@ void set_power(arr2d_t (*matr), int i, int j, int power){
 int main (int argc, char *argv[]) {
     //arr2d_t m = mx_new();
     //mx_fprint(m);
-    adminMenu();
+    adminMenu(argc, argv);
     return 0;
 }
