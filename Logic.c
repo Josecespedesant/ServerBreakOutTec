@@ -232,5 +232,8 @@ int main (int argc, char *argv[]) {
     
     pthread_join(thread_2, NULL); 
     pthread_join(thread_1, NULL);
-    exit(0);
+
+    sleep(60);
+
+    return 0;
 }
