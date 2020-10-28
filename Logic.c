@@ -118,7 +118,6 @@ void *server(){
     }
     close(conexion_servidor);
     return;
-
 }
 
 void *adminMenu(){
@@ -227,6 +226,7 @@ int main (int argc, char *argv[]) {
     pm = &m;
     pthread_t thread_1;
     pthread_t thread_2;
+
     pthread_create(&thread_2, NULL, adminMenu, NULL);
     pthread_create(&thread_1, NULL, server, NULL);
     
