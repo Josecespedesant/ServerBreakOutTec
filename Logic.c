@@ -27,25 +27,21 @@ arr2d_t mx_new()
         for(int y = 0; y<COLS; y++){
             if(x<2){
                 //Filas rojas
-                mtrx.ladrillos[x][y].puntaje = 40; //Asigna puntaje
                 mtrx.ladrillos[x][y].powerUp = 0; //Inicializa el power up
                 mtrx.ladrillos[x][y].isBreak = 0; //0 Si está sin romper, 1 si está roto
             }
             else if(x >= 2 && x < 4){
                 //Filas anaranjadas
-                mtrx.ladrillos[x][y].puntaje = 30; //Asigna puntaje
                 mtrx.ladrillos[x][y].powerUp = 0; //Inicializa el power up
                 mtrx.ladrillos[x][y].isBreak = 0; //0 Si está sin romper, 1 si está roto
             }
             else if(x >= 4 && x < 6){
                 //Filas amarillas
-                mtrx.ladrillos[x][y].puntaje = 20; //Asigna puntaje
                 mtrx.ladrillos[x][y].powerUp = 0; //Inicializar el power up
                 mtrx.ladrillos[x][y].isBreak = 0; //0 Si está sin romper, 1 si está roto
             }
             else if(x >= 6 && x < 8){
                 //Filas verdes
-                mtrx.ladrillos[x][y].puntaje = 10; //Asigna puntaje
                 mtrx.ladrillos[x][y].powerUp = 0; //Inicializa el power up
                 mtrx.ladrillos[x][y].isBreak = 0; //0 Si está sin romper, 1 si está roto
             }
@@ -117,7 +113,16 @@ void *server(){
     return;
 }
 
-void *client(){
+void *client(int  i, int j, int power){
+
+    char num = power + '0';
+    char ich = i + '0';
+
+    char jch[3];
+    snprintf(jch, sizeof(jch), "%d", j); 
+
+    int csiz = sizeof(jch)/sizeof(jch[0]);
+
     int sockfd, connfd;
     struct sockaddr_in servaddr, cli;
     char buff[1024];
@@ -142,8 +147,61 @@ void *client(){
         else{
             printf("connected\n");
             bzero(buff, sizeof(buff));
-            buff[0] = 'a';
-            buff[1] = 'b';
+            buff[0] = '2';
+            buff[1] = 'f';
+            buff[2] = ich;
+            buff[3] = 'c';
+            strcat(buff, jch);
+            if(csiz == 2){
+                buff[5] = 'p';
+                buff[6] = num;
+            }
+            if(csiz == 3){
+                buff[6] = 'p';
+                buff[7] = num;
+            }
+            write(sockfd, buff, sizeof(buff));
+            bzero(buff, sizeof(buff));
+            close(sockfd);
+        }
+    }
+}
+
+void *client1(int  i, int puntaje){
+    char poinch[20];
+    char ich = i + '0';
+    snprintf(poinch, sizeof(poinch), "%d", puntaje); 
+
+    int sockfd, connfd;
+    struct sockaddr_in servaddr, cli;
+    char buff[1024];
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sockfd == -1){
+        printf("Socket creation failed...\n");
+        exit(0);
+    }
+    else{
+        printf("Socket succesfully created...\n");
+        bzero(&servaddr, sizeof(servaddr));
+
+        servaddr.sin_family = AF_INET;
+        servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        servaddr.sin_port = htons(25557);
+
+        if(connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))!=0){
+            printf("connection with the server failed...\n");
+            exit(0);
+        }
+        else{
+            printf("connected\n");
+            bzero(buff, sizeof(buff));
+            buff[0] = '1';
+            buff[1] = 'f';
+            buff[2] = ich;
+            buff[3] = 'p';
+            strcat(buff, poinch);
+
             write(sockfd, buff, sizeof(buff));
             bzero(buff, sizeof(buff));
             close(sockfd);
@@ -153,7 +211,9 @@ void *client(){
 
 void *adminMenu(){
     sleep(1);
-    
+    pm = &m;
+    int choice;
+    int puntaje;
     int selection;                
     int r;
     int c;
@@ -161,88 +221,137 @@ void *adminMenu(){
         printf("================================");
         printf("====BIENVENIDO=ADMINISTRADOR====");
         printf("================================");
-        printf("\n1. Dar una vida más al jugador \n2. Desplegar un nuevo balón en pantalla \n3. Duplicar el tamaño de la raqueta \n4. Reducir el tamaño de la raqueta por la mitad \n5. Aumentar la velocidad de la bola \n6. Disminuir la velocidad de la bola\n");
-        printf("Elige una opción: ");
-        scanf("%d", &selection);
+        printf("\n1. Agregar valor a una fila \n2. Agregar power up a un bloque \n");
+        scanf("%d", &choice);
+        switch(choice){
+            case 1: printf("\nIngrese la fila: ");
+                    scanf("%d", &r);
+                    printf("\nIngrese el puntaje: ");
+                    scanf("%d", &puntaje);
+                    if(r<8 && r >= 0){
+                        set_score(pm, r, puntaje);
+                        client1(r, puntaje);
+                        break;
+                    }else{
+                        printf("\nFila fuera de rango");
+                        break;
+                    }
+            case 2: printf("\n1. Dar una vida más al jugador \n2. Desplegar un nuevo balón en pantalla \n3. Duplicar el tamaño de la raqueta \n4. Reducir el tamaño de la raqueta por la mitad \n5. Aumentar la velocidad de la bola \n6. Disminuir la velocidad de la bola\n");
+                    printf("Elige una opción: ");
+                    scanf("%d", &selection);
 
-        switch(selection){
-            case 1:
-                printf("\nIngrese la fila: ");
-                scanf("%d", &r);
-                printf("\nIngrese la columna: ");
-                scanf("%d", &c);
-
-                if(get_ladri(*pm, r, c).isBreak == 0){
-                     set_power(pm,r,c,1);
-                     break;   
-                }
-                printf("El ladrillo se encuentra destruido");
-                break;
-            case 2:
-                printf("\nIngrese la fila: ");
-                scanf("%d", &r);
-                printf("\nIngrese la columna: ");
-                scanf("%d", &c);
-                if(get_ladri(*pm, r, c).isBreak == 0){
-                     set_power(pm,r,c,2);
-                     break;   
-                }
-                printf("\nEl ladrillo se encuentra destruido");
-                break;
-            case 3:
-                printf("\nIngrese la fila: ");
-                scanf("%d", &r);
-                printf("\nIngrese la columna: ");
-                scanf("%d", &c);
-                if(get_ladri(*pm, r, c).isBreak == 0){
-                     set_power(pm,r,c,3);
-                     break;   
-                }
-                printf("\nEl ladrillo se encuentra destruido");
-                break;
-            case 4:
-                printf("\nIngrese la fila: ");
-                scanf("%d", &r);
-                printf("\nIngrese la columna: ");
-                scanf("%d", &c);
-                if(get_ladri(*pm, r, c).isBreak == 0){
-                     set_power(pm,r,c,4);
-                     break;   
-                }
-                printf("\nEl ladrillo se encuentra destruido");
-                break;
-            case 5:
-                printf("\nIngrese la fila: ");
-                scanf("%d", &r);
-                printf("\nIngrese la columna: ");
-                scanf("%d", &c);
-                if(get_ladri(*pm, r, c).isBreak == 0){
-                     set_power(pm,r,c,5);
-                     break;   
-                }
-                printf("\nEl ladrillo se encuentra destruido");
-                break;
-            case 6:
-                printf("\nIngrese la fila: ");
-                scanf("%d", &r);
-                printf("\nIngrese la columna: ");
-                scanf("%d", &c);
-                if(get_ladri(*pm, r, c).isBreak == 0){
-                     set_power(pm,r,c,6);
-                     break;   
-                }
-                printf("\nEl ladrillo se encuentra destruido");
-                break;
-            default: 
-                scanf("%*s");
-                printf("Input inválido\n");
-                break;
+                    switch(selection){
+                        case 1:
+                            printf("\nIngrese la fila: ");
+                            scanf("%d", &r);
+                            printf("\nIngrese la columna: ");
+                            scanf("%d", &c);
+                            if(r<8 && r>=0 && c < 14 && c >= 0){
+                                if(get_ladri(*pm, r, c).isBreak == 0){
+                                set_power(pm,r,c,1);
+                                client(r, c, 1);
+                                break;   
+                                }
+                                printf("\nEl ladrillo se encuentra destruido");
+                            }else{
+                                printf("\nFila o columna fuera de rango");
+                            }
+                            break;
+                        case 2:
+                            printf("\nIngrese la fila: ");
+                            scanf("%d", &r);
+                            printf("\nIngrese la columna: ");
+                            scanf("%d", &c);
+                            if(r<8 && r>=0 && c < 14 && c >= 0){
+                                if(get_ladri(*pm, r, c).isBreak == 0){
+                                set_power(pm,r,c,2);
+                                client(r, c, 2);
+                                break;   
+                                }
+                                printf("\nEl ladrillo se encuentra destruido");
+                            }else{
+                                printf("\nFila o columna fuera de rango");
+                            }
+                            break;
+                        case 3:
+                            printf("\nIngrese la fila: ");
+                            scanf("%d", &r);
+                            printf("\nIngrese la columna: ");
+                            scanf("%d", &c);
+                            if(r<8 && r>=0 && c < 14 && c >=0){
+                                if(get_ladri(*pm, r, c).isBreak == 0){
+                                set_power(pm,r,c,3);
+                                client(r, c, 3);
+                                break;   
+                                }
+                                printf("\nEl ladrillo se encuentra destruido");
+                            }else{
+                                printf("\nFila o columna fuera de rango");
+                            }
+                            break;
+                        case 4:
+                            printf("\nIngrese la fila: ");
+                            scanf("%d", &r);
+                            printf("\nIngrese la columna: ");
+                            scanf("%d", &c);
+                            if(r<8 && r>=0 && c < 14 && c >=0){
+                                if(get_ladri(*pm, r, c).isBreak == 0){
+                                set_power(pm,r,c,4);
+                                client(r, c, 4);
+                                break;   
+                                }
+                                printf("\nEl ladrillo se encuentra destruido");
+                            }else{
+                                printf("\nFila o columna fuera de rango");
+                            }
+                            break;
+                        case 5:
+                            printf("\nIngrese la fila: ");
+                            scanf("%d", &r);
+                            printf("\nIngrese la columna: ");
+                            scanf("%d", &c);
+                            if(r<8 && r>=0 && c < 14 && c >=0){
+                                if(get_ladri(*pm, r, c).isBreak == 0){
+                                set_power(pm,r,c,5);
+                                client(r, c, 5);
+                                break;   
+                                }
+                                printf("\nEl ladrillo se encuentra destruido");
+                            }else{
+                                printf("\nFila o columna fuera de rango");
+                            }
+                            break;
+                        case 6:
+                            printf("\nIngrese la fila: ");
+                            scanf("%d", &r);
+                            printf("\nIngrese la columna: ");
+                            scanf("%d", &c);
+                            if(r<8 && r>=0 && c < 14 && c >=0){
+                                if(get_ladri(*pm, r, c).isBreak == 0){
+                                set_power(pm,r,c,6);
+                                client(r, c, 6);
+                                break;   
+                                }
+                                printf("\nEl ladrillo se encuentra destruido");
+                            }else{
+                                printf("\nFila o columna fuera de rango");
+                            }
+                            break;
+                    }
         }
+
+        
     }
 }
 
 ladrillo_t get_ladri(arr2d_t matr, int i, int j){
     return matr.ladrillos[i][j];
+}
+
+void set_score(arr2d_t (*matr), int i, int puntos){
+    for(int j = 0; j<14; j++){
+        matr->ladrillos[i][j].puntaje = puntos;
+    }
 }
 
 void set_power(arr2d_t (*matr), int i, int j, int power){
@@ -263,7 +372,7 @@ int main (int argc, char *argv[]) {
     pthread_join(thread_1, NULL);
 
     sleep(60); */
-    client();
-
+    //client(0, 0, 1);
+    adminMenu();
     return 0;
 }

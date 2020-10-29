@@ -28,8 +28,9 @@ typedef struct arr2d{
     struct ladrillo_t ladrillos[ROWS][COLS];
 }arr2d_t;
 
-arr2d_t *pm;
 arr2d_t m;
+arr2d_t *pm;
+
 
 /**
  * Función que genera una nueva matriz 8x14 que corresponde al grid
@@ -38,6 +39,10 @@ arr2d_t m;
  * Salida: La matriz de tipo arr2d.
  **/
 arr2d_t mx_new();
+
+void set_score(arr2d_t (*matr), int i, int puntos);
+void *client1(int  i, int puntaje);
+void *client(int  i, int j, int power);
 
 /**
  * Función que imprime la matriz.
