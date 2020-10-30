@@ -28,6 +28,7 @@ typedef struct arr2d{
     struct ladrillo_t ladrillos[ROWS][COLS];
 }arr2d_t;
 
+
 arr2d_t m;
 arr2d_t *pm;
 
@@ -43,7 +44,8 @@ arr2d_t mx_new();
 void set_score(arr2d_t (*matr), int i, int puntos);
 void *client1(int  i, int puntaje);
 void *client(int  i, int j, int power);
-
+void set_broken(int i, int j);
+void *clientExp(int i, int j);
 /**
  * Función que imprime la matriz.
  * Entrada: Matriz de ladrillos.

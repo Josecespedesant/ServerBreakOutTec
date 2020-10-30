@@ -101,8 +101,27 @@ void *server(){
             return;
         } else {
             printf("%s\n", buffer);
+
+            char first[2];
+            first[0] = buffer[0];
+
+            int ro;
+            
+            ro = atoi(first);
+
+            char substr[4];
+            substr[0] = buffer[2];
+            substr[1] = buffer[3];
+
+            int col;
+
+            col = atoi(substr);
+
+            set_broken(ro, col);
+            clientExp(ro, col);
+
             bzero((char *) &buffer, sizeof(buffer));
-            //agregarAlJuego();
+
             if(conexion) {
                 send(conexion_cliente, mensaje, 1024, 0);
             }
@@ -111,6 +130,51 @@ void *server(){
     }
     close(conexion_servidor);
     return;
+}
+
+void *clientExp(int i, int j){
+
+    char ich = i + '0';
+
+    char jch[3];
+    snprintf(jch, sizeof(jch), "%d", j); 
+
+    int csiz = sizeof(jch)/sizeof(jch[0]);
+
+    int sockfd, connfd;
+    struct sockaddr_in servaddr, cli;
+    char buff[1024];
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sockfd == -1){
+        printf("Socket creation failed...\n");
+        exit(0);
+    }
+    else{
+        printf("Socket succesfully created...\n");
+        bzero(&servaddr, sizeof(servaddr));
+
+        servaddr.sin_family = AF_INET;
+        servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        servaddr.sin_port = htons(25556);
+
+        if(connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))!=0){
+            printf("connection with the server failed...\n");
+            exit(0);
+        }
+        else{
+            printf("connected\n");
+            bzero(buff, sizeof(buff));
+            buff[0] = ich;
+            buff[1] = 'c';
+            strcat(buff, jch);
+            
+            write(sockfd, buff, sizeof(buff));
+            bzero(buff, sizeof(buff));
+            close(sockfd);
+        }
+    }
+
 }
 
 void *client(int  i, int j, int power){
@@ -202,6 +266,7 @@ void *client1(int  i, int puntaje){
             buff[3] = 'p';
             strcat(buff, poinch);
 
+
             write(sockfd, buff, sizeof(buff));
             bzero(buff, sizeof(buff));
             close(sockfd);
@@ -211,14 +276,14 @@ void *client1(int  i, int puntaje){
 
 void *adminMenu(){
     sleep(1);
-    pm = &m;
+   
     int choice;
     int puntaje;
     int selection;                
     int r;
     int c;
     while(1){
-        printf("================================");
+        printf("\n================================");
         printf("====BIENVENIDO=ADMINISTRADOR====");
         printf("================================");
         printf("\n1. Agregar valor a una fila \n2. Agregar power up a un bloque \n");
@@ -359,20 +424,22 @@ void set_power(arr2d_t (*matr), int i, int j, int power){
     mx_fprint(*matr);
 }
 
+void set_broken(int i, int j){
+    m.ladrillos[i][j].isBreak = 1;
+}
+
 int main (int argc, char *argv[]) {
-   /* arr2d_t m = mx_new();
+    m = mx_new();
     pm = &m;
     pthread_t thread_1;
     pthread_t thread_2;
 
-  /  pthread_create(&thread_2, NULL, adminMenu, NULL);
-    pthread_create(&thread_1, NULL, serv, NULL);
+    pthread_create(&thread_2, NULL, adminMenu, NULL);
+    pthread_create(&thread_1, NULL, server, NULL);
     
     pthread_join(thread_2, NULL); 
     pthread_join(thread_1, NULL);
 
-    sleep(60); */
-    //client(0, 0, 1);
-    adminMenu();
+    sleep(60); 
     return 0;
 }
