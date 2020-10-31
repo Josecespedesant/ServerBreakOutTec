@@ -30,6 +30,7 @@ typedef struct arr2d{
 
 
 arr2d_t m;
+
 arr2d_t *pm;
 
 
@@ -41,19 +42,51 @@ arr2d_t *pm;
  **/
 arr2d_t mx_new();
 
-void set_score(arr2d_t (*matr), int i, int puntos);
-void *client1(int  i, int puntaje);
-void *client(int  i, int j, int power);
-void set_broken(int i, int j);
-void *clientExp(int i, int j);
 /**
- * Función que imprime la matriz.
+ * Función que establece el score de una fila
+ * Entradas: matriz, fila y cantidad de puntos
+ **/
+void set_score(arr2d_t (*matr), int i, int puntos);
+
+/**
+ * Función que envia la fila con el puntaje
+ * Entradas: fila y cantidad de puntos
+ **/
+void *client1(int  i, int puntaje);
+
+/**
+ * Función que envia la fila, la columna y el poder del bloque
+ * Entradas: fila, columna y poder
+ **/
+void *client(int  i, int j, int power);
+
+/**
+ * Función que establece el bloque como roto
+ * Entradas: fila y columna
+ **/
+void set_broken(int i, int j);
+
+/**
+ * Función que envia al cliente expectador la fila y col del bloque destruido
+ * Entradas: fila y columna
+ **/
+void *clientExp(int i, int j);
+
+/**
+ * Función que imprime la matriz
  * Entrada: Matriz de ladrillos.
  * No devuelve nada, imprime la matriz. 
  **/
 void mx_fprint(arr2d_t mtrx);
 
+/**
+ * Menú del administrador
+ **/
 void *adminMenu();
+
+/**
+ * Servidor que recibe los bloques destruidos
+ **/
 void *server();
 
 /**
@@ -63,6 +96,10 @@ void *server();
  **/
 ladrillo_t get_ladri(arr2d_t matr, int i, int j);
 
+/**
+ * Establece el poder de un bloque
+ * Entradas: matriz, fila, columna y poder
+ **/
 void set_power(arr2d_t (*matr), int i, int j, int power);
 
 #endif
